@@ -1,0 +1,41 @@
+
+---
+- name: User and permission settings
+  hosts: all
+  become: yes
+  
+  tasks:
+  - name: Adding user and password
+    ansible.builtin.user:
+      name: cloudru
+      password: $6$foM7oSMVpvOo25Wh$M5z.8UOm5dGkVOiGPnm0oUDL0xSROkLRCd.AXXJXuuiXUl8gUMN9UzRu1OztzEaQdbihi0sG9izm0X5qP6TS0.
+      shell: "/bin/bash"
+      createhome: true
+      home: "/home/cloudru"
+  
+  - name: Set authorized key taken from file
+    ansible.posix.authorized_key:
+      user: cloudru
+      state: present
+      key: "{{ lookup('file', '/home/morekhov/ansible/.SSH-key') }}"    
+  
+  - name: Add a line to a file
+    ansible.builtin.lineinfile:
+      path: /etc/ssh/sshd_config
+      line: PermitRootLogin no
+      create: yes
+
+  - name: Setting PubkeyAuthentication yes
+    ansible.builtin.replace:
+      dest: /etc/ssh/sshd_config
+      regexp: ^#PubkeyAuthentication yes
+      replace: PubkeyAuthentication yes
+    notify: Reload sshd
+
+  handlers:
+    - name: Reload sshd
+      ansible.builtin.systemd:
+        state: reloaded
+        name: sshd
+
+
