@@ -5,7 +5,7 @@
   become: yes
   
   tasks:
-  - name: Adding user and password
+  - name: Adding user and password #Добавление пользователя и пароля
     ansible.builtin.user:
       name: cloudru
       password: $6$foM7oSMVpvOo25Wh$M5z.8UOm5dGkVOiGPnm0oUDL0xSROkLRCd.AXXJXuuiXUl8gUMN9UzRu1OztzEaQdbihi0sG9izm0X5qP6TS0.
@@ -13,19 +13,19 @@
       createhome: true
       home: "/home/cloudru"
   
-  - name: Set authorized key taken from file
+  - name: Set authorized key taken from file #Добавление публичного ключа
     ansible.posix.authorized_key:
       user: cloudru
       state: present
-      key: "{{ lookup('file', '/home/morekhov/ansible/.SSH-key') }}"    
+      key: "{{ lookup('file', '/path/to/key') }}" #Путь до ключа на локальной машине
   
-  - name: Add a line to a file
+  - name: Add a line to a file #Запрет логина по ssh под root пользователем
     ansible.builtin.lineinfile:
       path: /etc/ssh/sshd_config
       line: PermitRootLogin no
       create: yes
 
-  - name: Setting PubkeyAuthentication yes
+  - name: Setting PubkeyAuthentication yes #Разрешение аутентификации по ключу
     ansible.builtin.replace:
       dest: /etc/ssh/sshd_config
       regexp: ^#PubkeyAuthentication yes
@@ -33,7 +33,7 @@
     notify: Reload sshd
 
   handlers:
-    - name: Reload sshd
+    - name: Reload sshd #Перезагрузка демона ssh
       ansible.builtin.systemd:
         state: reloaded
         name: sshd

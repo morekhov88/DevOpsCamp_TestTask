@@ -1,1 +1,0 @@
-# DevOpsCamp_TestTask
