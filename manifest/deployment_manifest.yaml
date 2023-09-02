@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-space
+
+
+---
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deploy1
+  namespace: my-space
+  labels:
+    app: app-for-dev-ops-camp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app-for-dev-ops-camp
+  template:
+    metadata:
+      labels:
+        app: app-for-dev-ops-camp
+    spec:
+      containers:
+        - name: docker-app
+          image: mishabugor/dev_ops_camp_web_app:v2
+          ports:
+          - containerPort: 8000
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          env:
+            - name: MY_POD_UUID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+
+---
+
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-cluster-ip
+  namespace: my-space
+spec:
+  type: ClusterIP
+  selector:
+    app: app-for-dev-ops-camp
+  ports:
+    - port: 8000
+      targetPort: 8000

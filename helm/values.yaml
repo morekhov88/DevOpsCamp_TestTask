@@ -1,0 +1,10 @@
+#Количество создаваемых подов
+replicaCount: 3
+
+#Образ приложения на DockerHub
+image:
+  repository: mishabugor/dev_ops_camp_web_app:v2
+
+#Значение переменной AUTHOR.
+env:
+  author: mOrekhov
